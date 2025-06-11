@@ -1,15 +1,29 @@
-import { useSelector } from "react-redux";
+import { useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { signOut } from "../redux/user/userSlice";
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const fileRef = useRef();
+  const handleSignout = async () => {
+    try {
+      await fetch("http://localhost:5000/api/auth/signout");
+      dispatch(signOut());
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="max-w-lg mx-auto p-3">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
       <form className="flex flex-col gap-4">
+        <input type="file" ref={fileRef} hidden accept="image/*" />
         <img
           src={currentUser.profilePicture}
           alt=""
           className="w-24 h-24 rounded-full object-cover self-center cursor-pointer"
+          onClick={() => fileRef.current.click()}
         />
         <input
           defaultValue={currentUser.username}
@@ -37,7 +51,9 @@ function Profile() {
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
-        <span className="text-red-700 cursor-pointer">Sign Out</span>
+        <span onClick={handleSignout} className="text-red-700 cursor-pointer">
+          Sign Out
+        </span>
       </div>
     </div>
   );
